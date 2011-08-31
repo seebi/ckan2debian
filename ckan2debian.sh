@@ -12,6 +12,7 @@ then
     exit 1;
 fi
 
+curlcommand="curl --fail -A ckan2debian.sh -s -L"
 PREFIXES="PREFIX moat:<http://moat-project.org/ns#> PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX dct:<http://purl.org/dc/terms/> PREFIX dcat:<http://www.w3.org/ns/dcat#> "
 today=$(date +%Y%m%d)
 package="ckan-dataset-$datasetName"
@@ -23,22 +24,22 @@ rm -rf $dirname
 mkdir -p $dirname
 cd $dirname
 
-echo -n "Fetch dataset JSON and search for id: "
-jsonuri="http://ckan.net/api/2/rest/package/$datasetName"
-wget -q $jsonuri -O ckan.json || exit 1
-datasetId=$(php5 -r "\$json = json_decode(file_get_contents('ckan.json'));echo \$json->id;")
-echo "$datasetId"
-
-echo -n "Fetch dataset RDF and search for dump URL: "
-rdfuri="http://semantic.ckan.net/record/$datasetId.rdf"
-wget -q $rdfuri -O ckan.rdf || exit 1
-dumpurl=$(roqet -q -i sparql -e "${PREFIXES} SELECT ?url WHERE {?s  a dcat:Distribution. ?s dcat:accessURL ?url. ?s dct:format ?f. ?f moat:taggedWithTag ?t. ?t moat:name \"rdf+xml\"}" -D ckan.rdf -r csv | tail -1 | cut -d "(" -f 2 | cut -d ")" -f 1)
+echo -n "Fetch dataset turtle and search for dump URL: "
+$curlcommand -H "Accept: application/turtle" $modeluri >ckan.ttl || exit 1
+dumpurl=$(roqet -q -i sparql -e "${PREFIXES}\
+    SELECT ?url WHERE {\
+        ?s  a dcat:Distribution.\
+        ?s dcat:accessURL ?url.\
+        ?s dct:format ?f. \
+        ?f moat:taggedWithTag ?t.\
+        { ?t moat:name \"application/rdf+xml\"}\
+            UNION
+        { ?t moat:name \"rdf+xml\"}\
+    }" -D ckan.ttl -r csv | tail -1 | cut -d "(" -f 2 | cut -d ")" -f 1)
 echo $dumpurl
-rapper -q ckan.rdf -o turtle -O - >ckan.ttl
-rm ckan.rdf
 
 echo -n "Try to download the dump: "
-wget -q $dumpurl -O data.rdf || exit 1
+$curlcommand -H "Accept: application/rdf+xml" $dumpurl >data.rdf || exit 1
 echo "Done"
 
 echo -n "Validate the dump: "
