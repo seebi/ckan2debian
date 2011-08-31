@@ -1,0 +1,4 @@
+data.ttl     usr/share/ckan/%%name%%/
+ckan.ttl     usr/share/ckan/%%name%%/
+ckan.json    usr/share/ckan/%%name%%/
+
