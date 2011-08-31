@@ -12,7 +12,7 @@ then
     exit 1;
 fi
 
-curlcommand="curl --fail -A ckan2debian.sh -s -L"
+curlcommand="curl -# -A ckan2debian.sh -L"
 PREFIXES="PREFIX moat:<http://moat-project.org/ns#> PREFIX rdf:<http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX dct:<http://purl.org/dc/terms/> PREFIX dcat:<http://www.w3.org/ns/dcat#> "
 today=$(date +%Y%m%d)
 package="ckan-dataset-$datasetName"
@@ -24,7 +24,7 @@ rm -rf $dirname
 mkdir -p $dirname
 cd $dirname
 
-echo -n "Fetch dataset turtle and search for dump URL: "
+echo "Fetch dataset turtle:"
 $curlcommand -H "Accept: application/turtle" $modeluri >ckan.ttl || exit 1
 dumpurl=$(roqet -q -i sparql -e "${PREFIXES}\
     SELECT ?url WHERE {\
@@ -36,11 +36,11 @@ dumpurl=$(roqet -q -i sparql -e "${PREFIXES}\
             UNION
         { ?t moat:name \"rdf+xml\"}\
     }" -D ckan.ttl -r csv | tail -1 | cut -d "(" -f 2 | cut -d ")" -f 1)
+echo -n "Search for dump URL: "
 echo $dumpurl
 
-echo -n "Try to download the dump: "
-$curlcommand -H "Accept: application/rdf+xml" $dumpurl >data.rdf || exit 1
-echo "Done"
+echo "Download the dump: "
+$curlcommand ${dumpurl} -o data.rdf || exit 1
 
 echo -n "Validate the dump: "
 rapper data.rdf -o turtle -O - >data.ttl 2>data.log || exit 1
@@ -49,18 +49,16 @@ count=$(cat data.log | tail -1 | cut -d " " -f 4)
 echo "(found $count triple)"
 rm data.log data.rdf
 
+echo "Create package info and replace dataset specific values"
 cp -R ../debian.stub debian
-cd debian
-
-echo "Replace package specific values"
-grep -rl "%%package%%" .  | xargs sed -i "s|%%package%%|${package}|g"
-grep -rl "%%name%%" .     | xargs sed -i "s|%%name%%|${datasetName}|g"
-grep -rl "%%date%%" .     | xargs sed -i "s|%%date%%|${today}|g"
-grep -rl "%%count%%" .    | xargs sed -i "s|%%count%%|${count}|g"
-grep -rl "%%modeluri%%" . | xargs sed -i "s|%%modeluri%%|${modeluri}|g"
+grep -rl "%%package%%" debian  | xargs sed -i "s|%%package%%|${package}|g"
+grep -rl "%%name%%" debian     | xargs sed -i "s|%%name%%|${datasetName}|g"
+grep -rl "%%date%%" debian     | xargs sed -i "s|%%date%%|${today}|g"
+grep -rl "%%count%%" debian    | xargs sed -i "s|%%count%%|${count}|g"
+grep -rl "%%modeluri%%" debian | xargs sed -i "s|%%modeluri%%|${modeluri}|g"
 
 echo -n "Build the package: "
-debuild >../debuild.log || exit 1
+debuild >../${package}.log || exit 1
 echo "done"
 
 
