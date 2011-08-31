@@ -31,7 +31,8 @@ The package generation script depends on the following commands:
 * there is no changelog written, just one package without a history
 * package description should be enhanced
 * package license should be used from the dataset
-* there are not so much dataset which comply with the requirements
+* there are not so much datasets which comply with the requirements (a list of
+  valid datasets is in file `ValidPackages.txt`)
 
 ## example run
 This is an example run of the script which creates a debian package of the CKAN
