@@ -1,39 +1,13 @@
 #!/bin/sh -e
-# postinst script for ckan dataset packages
-#
-# see: dh_installdeb(1)
 
-echo "---- starting postinst $@"
-
-### virtuoso environment
-virtetc="/etc/virtuoso-opensource-6.1/"
-virtuosoini="$virtetc/virtuoso.ini"
-# TODO: use a generic ckan user here (maybe a ckan-common package?)
-virtuser="dba"
-virtpass="dba"
-isqlrun="isql-vt -U ${virtuser} -P ${virtpass}" # output only error messages
-
-### ckan environment
-package="%%package%%"
-datadir="/usr/share/ckan/%%name%%"
-modeluri="%%modeluri%%"
-
-# stop the server
-sudo service virtuoso-opensource-6.1 stop
-
-# add ckan directory to DirsAllowed
-# try to remove the addition first in order to avoid double entries
-sed 's/^\(DirsAllowed.*\)\(, \/usr\/share\/ckan\)\(.*\)/\1\3/' -i $virtuosoini
-sed 's/^\(DirsAllowed.*\)/\1, \/usr\/share\/ckan/' -i $virtuosoini
-
-# restart the server
-sudo service virtuoso-opensource-6.1 start
-
-# import the dataset dump to virtuoso
-echo "SPARQL CREATE SILENT GRAPH <${modeluri}>;" | $isqlrun >/dev/null
-echo "ttlp (file_to_string_output('${datadir}/ckan.ttl'), '', '${modeluri}');" | $isqlrun >/dev/null
-echo "ttlp (file_to_string_output('${datadir}/data.ttl'), '', '${modeluri}');" | $isqlrun >/dev/null
+script=/usr/bin/rdf-dataset-integration
+if [ -x $script ]; then
+    package="%%package%%"
+    datadir="/usr/share/$package"
+    modeluri="%%uri%%"
+    $script $@ $datadir $modeluri
+else
+    echo "Can not process rdf-package automatically (install rdf-dataset-integration for integration)"
+fi
 
 #DEBHELPER#
-
-echo "---- ending postinst $@"

@@ -1,12 +1,11 @@
 default:
-	@echo "targets: clean, valid, valid-parallel"
+	@echo "targets: clean, test"
 
 clean:
-	rm -rf ckan-dataset*
+	rm -rf rdf-dataset*
 
-valid:
-	cat ValidPackages.txt | xargs ./ckan2debian.sh
+test-package-dir:
+	./ckan2debian.sh test/aksworg.cfg
 
-valid-parallel:
-	cat ValidPackages.txt | parallel ./ckan2debian.sh {}
-
+test: test-package-dir
+	cd rdf-dataset-aksworg && debuild

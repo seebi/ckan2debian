@@ -1,27 +1,13 @@
 #!/bin/sh -e
-# postrm script for ckan dataset packages
-#
-# see: dh_installdeb(1)
 
-echo "---- starting postrm $@"
-
-### virtuoso environment
-virtetc="/etc/virtuoso-opensource-6.1/"
-virtuosoini="$virtetc/virtuoso.ini"
-# TODO: use a generic ckan user here (maybe a ckan-common package?)
-virtuser="dba"
-virtpass="dba"
-isqlrun="isql-vt -U ${virtuser} -P ${virtpass}" # output only error messages
-
-### ckan environment
-package="%%package%%"
-datadir="/usr/share/ckan/%%name%%"
-modeluri="%%modeluri%%"
-
-# drop graph
-# http://virtuoso.openlinksw.com/dataspace/dav/wiki/Main/VirtTipsAndTricksGuideCreateGraph
-echo "SPARQL DROP SILENT GRAPH <${modeluri}>;" | $isqlrun >/dev/null
+script=/usr/bin/rdf-dataset-integration
+if [ -x $script ]; then
+    package="%%package%%"
+    datadir="/usr/share/$package"
+    modeluri="%%uri%%"
+    $script $@ $datadir $modeluri
+else
+    echo "Can not process rdf-package automatically (install rdf-dataset-integration for integration)"
+fi
 
 #DEBHELPER#
-
-echo "---- ending postrm $@"

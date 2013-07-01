@@ -1,5 +1,5 @@
 %%package%% (%%date%%) lod2; urgency=low
 
-  * Downloaded dataset from %%date%%
+  * dataset %%id%% from %%date%% with %%count%% triple 
 
- -- Sebastian Tramp <tramp@informatik.uni-leipzig.de>  Fri, 12 Aug 2011 15:49:16 +0200
+ -- Sebastian Tramp <tramp@informatik.uni-leipzig.de>  Mon, 1 Jul 2013 10:49:16 +0200

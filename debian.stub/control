@@ -3,13 +3,14 @@ Section: misc
 Priority: extra
 Maintainer: Sebastian Tramp <tramp@informatik.uni-leipzig.de>
 Build-Depends: debhelper (>= 7.0.50~)
-Standards-Version: 3.9.1
-Homepage: http://thedatahub.org/
+Standards-Version: 3.9.3
+Homepage: %%homepage%%
 
 Package: %%package%%
 Architecture: all
-Depends: ${misc:Depends}, virtuoso-opensource-6.1
-Description: CKAN dataset %%name%% as an LOD2 stack package (%%count%% triple)
+Depends: ${misc:Depends}
+Suggests: rdf-dataset-integration
+Description: %%name%% (RDF dataset with %%count%% triple)
  description here
  .
  LOD2 is a large-scale integrating project co-funded by the European
