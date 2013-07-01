@@ -46,6 +46,7 @@ grep -rl "%%name%%" debian           | xargs sed -i "s|%%name%%|${datasetName}|g
 grep -rl "%%homepage%%" debian       | xargs sed -i "s|%%homepage%%|${datasetHomepage}|g"
 grep -rl "%%downloadUrl%%" debian    | xargs sed -i "s|%%downloadUrl%%|${datasetDownloadUrl}|g"
 grep -rl "%%date%%" debian           | xargs sed -i "s|%%date%%|${today}|g"
+grep -rl "%%description%%" debian    | xargs sed -i "s|%%description%%|${datasetDescription}|g"
 grep -rl "%%count%%" debian          | xargs sed -i "s|%%count%%|${datasetCount}|g"
 grep -rl "%%uri%%" debian            | xargs sed -i "s|%%uri%%|${datasetUri}|g"
 grep -rl "%%package%%" debian        | xargs sed -i "s|%%package%%|${datasetPackage}|g"
