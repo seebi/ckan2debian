@@ -26,7 +26,7 @@ echo $datasetId
 echo $datasetName
 echo $datasetDescription
 echo $datasetDump
-echo $datasetCount
+echo $datasetTripleCount
 echo $datasetUri
 echo $datasetPackage
 
@@ -36,7 +36,6 @@ mkdir -p $datasetPackage
 
 cp $datasetDump $datasetPackage/data.nt.gz
 cp $datasetMeta $datasetPackage/meta.nt.gz
-
 cd $datasetPackage
 
 echo "Create package info and replace dataset specific values"
@@ -47,7 +46,7 @@ grep -rl "%%homepage%%" debian       | xargs sed -i "s|%%homepage%%|${datasetHom
 grep -rl "%%downloadUrl%%" debian    | xargs sed -i "s|%%downloadUrl%%|${datasetDownloadUrl}|g"
 grep -rl "%%date%%" debian           | xargs sed -i "s|%%date%%|${today}|g"
 grep -rl "%%description%%" debian    | xargs sed -i "s|%%description%%|${datasetDescription}|g"
-grep -rl "%%count%%" debian          | xargs sed -i "s|%%count%%|${datasetCount}|g"
+grep -rl "%%count%%" debian          | xargs sed -i "s|%%count%%|${datasetTripleCount}|g"
 grep -rl "%%uri%%" debian            | xargs sed -i "s|%%uri%%|${datasetUri}|g"
 grep -rl "%%package%%" debian        | xargs sed -i "s|%%package%%|${datasetPackage}|g"
 grep -rl "%%copyrightYear%%" debian  | xargs sed -i "s|%%copyrightYear%%|${datasetCopyrightYear}|g"

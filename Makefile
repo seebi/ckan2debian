@@ -4,8 +4,8 @@ default:
 clean:
 	rm -rf rdf-dataset*
 
-test-package-dir:
-	./ckan2debian.sh test/aksworg.cfg
+test-package-dir: clean
+	./ckan2debian.sh test/aksworg-datahubio.cfg
 
 test: test-package-dir
-	cd rdf-dataset-aksworg && debuild
+	cd rdf-dataset-aksworg-datahubio && debuild
